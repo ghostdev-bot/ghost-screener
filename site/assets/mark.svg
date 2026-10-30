@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Ghost Screener">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5cf2a6"/><stop offset="1" stop-color="#1fb873"/></linearGradient></defs>
+  <rect width="64" height="64" rx="14" fill="#07100c"/>
+  <path d="M32 9c-10.5 0-18 7.8-18 18.5V53l5-4 4.5 4 4.3-4 4.2 4 4.2-4 4.3 4 4.5-4 5 4V27.5C50 16.8 42.5 9 32 9z" fill="url(#g)"/>
+  <rect x="20" y="22" width="24" height="15" rx="5" fill="#07100c"/>
+  <polyline points="22.5,33 27,29.5 30.5,31.5 35,25.5 38.5,28 41.5,25" fill="none" stroke="#5cf2a6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

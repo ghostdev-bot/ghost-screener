@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' https: data:; connect-src 'self' https://api.dexscreener.com https://api.geckoterminal.com; manifest-src 'self'; worker-src 'self'; frame-src https://www.geckoterminal.com https://dexscreener.com; base-uri 'none'; form-action 'none'">
+<title>Ghost Screener · trending Solana memecoins, live</title>
+<meta name="description" content="Ghost Screener: a lightweight, independent screener for trending Solana memecoins with live public market data. Not financial advice.">
+<meta property="og:title" content="Ghost Screener">
+<meta property="og:description" content="Trending Solana memecoins, live. Built by Ghost Dev, the AI dev that never logs off.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ghostscreener.surge.sh/">
+<meta property="og:image" content="https://ghostscreener.surge.sh/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Ghost Screener">
+<meta name="twitter:description" content="Trending Solana memecoins, live. Not financial advice.">
+<meta name="twitter:image" content="https://ghostscreener.surge.sh/assets/og.png">
+<link rel="canonical" href="https://ghostscreener.surge.sh/">
+<meta name="theme-color" content="#050807">
+<link rel="icon" type="image/svg+xml" href="/assets/mark.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ghost Screener">
+<meta name="application-name" content="Ghost Screener">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav class="top"><div class="wrap">
+  <a class="brand" href="#/"><img src="assets/mark.svg" alt="" width="32" height="32"><span>GHOST<b>SCREENER</b></span></a>
+  <div class="navr">
+    <a href="#/" class="nl">Screener</a>
+    <a href="#/featured" class="nl">Get Featured</a>
+    <span class="live" id="live"><i></i><span id="liveTxt">connecting…</span></span>
+  </div>
+</div></nav>
+
+<main id="app">
+  <!-- HOME -->
+  <div id="viewHome">
+    <section class="wrap board" aria-label="Trending Solana tokens">
+      <div class="boardHead">
+        <div class="tabs" role="tablist">
+          <button role="tab" class="tab on" data-tab="trending">🔥 Trending</button>
+          <button role="tab" class="tab" data-tab="fresh">🆕 New profiles</button>
+        </div>
+        <form class="search" id="searchForm" role="search" autocomplete="off">
+          <input id="q" type="search" placeholder="Filter · Enter to search · paste a mint" aria-label="Search tokens">
+        </form>
+      </div>
+      <div class="boardMeta mut sm"><span id="listSrc"></span><span id="upd"></span></div>
+      <div class="tblWrap">
+        <table class="tbl" id="tbl">
+          <thead><tr>
+            <th data-k="rank" class="num hm">#</th>
+            <th data-k="name" class="tl">Token</th>
+            <th data-k="price" class="num">Price</th>
+            <th data-k="m5" class="num hm">5m</th>
+            <th data-k="h1" class="num hm">1h</th>
+            <th data-k="h24" class="num">24h</th>
+            <th data-k="vol" class="num hm">Vol 24h</th>
+            <th data-k="liq" class="num hm">Liquidity</th>
+            <th data-k="mcap" class="num">Mcap/FDV</th>
+            <th data-k="age" class="num hm">Age</th>
+            <th class="tl nos hm">Links</th>
+          </tr></thead>
+          <tbody id="rows"><tr><td colspan="11" class="loading">Summoning live data…</td></tr></tbody>
+        </table>
+      </div>
+      <p class="mut xs">Tap a row for details. Mcap shown when the source reports it, otherwise FDV (marked “fdv”). Lists auto-refresh every 60s while this tab is open.</p>
+    </section>
+
+    <section class="wrap feat" id="feat" aria-label="Featured token">
+      <div class="featHead">
+        <span class="pill">★ FEATURED · house token</span>
+        <span class="mut sm" id="featSrc"></span>
+      </div>
+      <div class="featGrid">
+        <div class="featInfo">
+          <div class="featId">
+            <img src="assets/avatar.jpg" alt="Ghost Dev logo" class="featLogo" width="64" height="64">
+            <div>
+              <h1>Ghost Dev <span class="sym">$GHOSTDEV</span></h1>
+              <button class="ca" id="featCa" type="button" title="Copy contract address"><code>G95bm7…v5R8g</code><span>copy</span></button>
+            </div>
+          </div>
+          <div class="featPrice"><span id="fPrice" class="big">—</span> <span id="fChg" class="chg">—</span><span class="mut sm"> 24h</span></div>
+          <dl class="stats" id="featStats">
+            <div><dt>Market cap</dt><dd id="fMcap">—</dd></div>
+            <div><dt>Volume 24h</dt><dd id="fVol">—</dd></div>
+            <div><dt id="fLiqLbl">Liquidity</dt><dd id="fLiq">—</dd></div>
+            <div><dt>1h change</dt><dd id="fH1">—</dd></div>
+            <div><dt>Txns 24h (buy/sell)</dt><dd id="fTx">—</dd></div>
+            <div><dt>Curve progress</dt><dd id="fCurve">—</dd></div>
+          </dl>
+          <div class="btns">
+            <a class="btn p" href="https://pump.fun/coin/G95bm7QTxj5EeTiZWjDUM4WHjHoQ9XQWTCtQokqv5R8g" target="_blank" rel="noopener">pump.fun ↗</a>
+            <a class="btn s" href="https://ghostdev.surge.sh" target="_blank" rel="noopener">ghostdev.surge.sh ↗</a>
+            <a class="btn s" href="#/token/G95bm7QTxj5EeTiZWjDUM4WHjHoQ9XQWTCtQokqv5R8g">Details →</a>
+          </div>
+          <p class="mut xs">Featured because it's our own project — not an endorsement. Do your own research.</p>
+        </div>
+        <div class="featChart">
+          <div class="frame" id="featFrame"><div class="ph">Chart loads here…</div></div>
+          <p class="mut xs" id="featChartSrc">Chart widget: GeckoTerminal</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap getfeat" id="getFeatured">
+      <div class="gfCard">
+        <div>
+          <p class="kicker">// get featured</p>
+          <h2>Paid featured slots — coming soon</h2>
+          <p>We're planning a small number of clearly-labeled “Featured” slots for Solana projects. Not live yet: there is no payment flow on this site, and nobody can sell you a slot today. Want to hear when it opens?</p>
+          <ul class="gfList">
+            <li>Featured slots will always be labeled as paid placement.</li>
+            <li>Featuring is not an endorsement, audit, or safety check.</li>
+            <li>We'll never ask for your seed phrase or private keys.</li>
+          </ul>
+        </div>
+        <a class="btn p" href="https://x.com/GrokBotreal" target="_blank" rel="noopener">DM @GrokBotreal on X ↗</a>
+      </div>
+    </section>
+  </div>
+
+  <!-- TOKEN DETAIL -->
+  <div id="viewToken" hidden>
+    <section class="wrap detail">
+      <a href="#/" class="back">← Back to screener</a>
+      <div id="dBody"><div class="loading">Loading token…</div></div>
+    </section>
+  </div>
+</main>
+
+<footer><div class="wrap">
+  <p class="disc">Not financial advice. Memecoins are high risk.</p>
+  <p>Data: <a href="https://docs.dexscreener.com/api/reference" target="_blank" rel="noopener">DexScreener API</a> / <a href="https://www.geckoterminal.com/dex-api" target="_blank" rel="noopener">GeckoTerminal</a>. Charts are embedded widgets from their respective sources. Data is shown as reported and may be delayed or wrong.</p>
+  <p>Ghost Screener is an independent project and is not affiliated with, endorsed by, or an official product of DexScreener, GeckoTerminal, CoinGecko, or pump.fun. Listing ≠ endorsement. Anyone can launch a token; many go to zero.</p>
+  <p><a href="https://x.com/GrokBotreal" target="_blank" rel="noopener">@GrokBotreal</a> · <a href="https://ghostdev.surge.sh" target="_blank" rel="noopener">ghostdev.surge.sh</a> · 👻 built by Ghost Dev</p>
+</div></footer>
+<div class="offline" id="offline" hidden role="status"></div>
+<div class="install" id="install" hidden role="dialog" aria-label="Install Ghost Screener">
+  <img src="/assets/icons/icon-192.png" alt="" width="40" height="40">
+  <div class="installTxt" id="installTxt"></div>
+  <button type="button" class="btn p" id="installBtn" hidden>Install</button>
+  <button type="button" class="x" id="installX" aria-label="Dismiss">✕</button>
+</div>
+<div class="toast" id="toast"></div>
+<script src="js/app.js"></script>
+</body>
+</html>
