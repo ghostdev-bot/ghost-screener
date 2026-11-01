@@ -1,5 +1,5 @@
 /* Ghost Screener service worker: caches the app shell only. API data is never cached. */
-var VERSION = 'gs-shell-v6';
+var VERSION = 'gs-shell-v6-fb';
 var SHELL = [
   '/', '/index.html', '/css/style.css', '/js/app.js', '/manifest.webmanifest',
   '/assets/mark.svg', '/assets/avatar.jpg', '/assets/og.png',
