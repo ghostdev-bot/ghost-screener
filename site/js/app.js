@@ -159,11 +159,31 @@
     for (var i = 1; i <= CFG.TRENDING_PAGES; i++) pages.push(i);
     return pages.reduce(function (pr, pg) {
       return pr.then(function (acc) {
-        return getJSON(CFG.GT + '/networks/solana/trending_pools?include=base_token,dex&page=' + pg)
+        return getTrendingPage(pg)
           .then(function (j) { return acc.concat(fromGtPools(j)); }, function (e) { if (!acc.length) throw e; return acc; });
       });
     }, Promise.resolve([])).then(function (rows) {
       var seen = {}; return rows.filter(function (r) { if (seen[r.addr]) return false; seen[r.addr] = 1; return true; });
+    }, function (e) {
+      // Live API down or rate limited (GeckoTerminal free tier ~30 req/min per IP): fall back to the last good
+      // copy in this browser, then to the box-built snapshot /data/trending.json (refreshed by scripts/refresh.sh).
+      var c = null; try { c = JSON.parse(localStorage.getItem(TREND_KEY) || 'null'); } catch (x) {}
+      var fromCache = c && c.j ? Promise.resolve(c) : getJSON('/data/trending.json').then(function (j) { return { t: Date.parse(j.generatedAt) || 0, j: j }; });
+      return fromCache.then(function (c2) {
+        var rows = fromGtPools(c2.j); if (!rows.length) throw e;
+        rows.cachedAt = c2.t; rows.cause = e; return rows;
+      }, function () { throw e; });
+    });
+  }
+  var TREND_KEY = 'gs_trending_v1';
+  // One retry after a short pause on 429 / network errors before giving up on the live API.
+  function getTrendingPage(pg) {
+    var url = CFG.GT + '/networks/solana/trending_pools?include=base_token,dex&page=' + pg;
+    return getJSON(url).catch(function (e) {
+      return new Promise(function (r) { setTimeout(r, e.status === 429 ? 2500 : 1200); }).then(function () { return getJSON(url); });
+    }).then(function (j) {
+      if (pg === 1) { try { localStorage.setItem(TREND_KEY, JSON.stringify({ t: Date.now(), j: j })); } catch (x) {} }
+      return j;
     });
   }
   function loadFresh() {
@@ -242,6 +262,16 @@
     return p.then(function (rows) {
       if (state.tab !== tab) return;
       rows.forEach(function (r, i) { r.rank = i + 1; });
+      if (rows.cachedAt != null) {
+        // cached fallback: show it, but say clearly that it is not live, and keep retrying every 60s
+        if (state.rows.length && silent) return; // keep the newer live rows already on screen
+        state.rows = rows;
+        $('listSrc').textContent = SRC_LABEL[tab] + ' · cached copy';
+        $('upd').textContent = 'Live API ' + (rows.cause && rows.cause.status === 429 ? 'rate limited' : 'unavailable') + ' · showing data from ' + (rows.cachedAt ? new Date(rows.cachedAt).toLocaleString() : 'an earlier snapshot') + ' · retrying every 60s';
+        setLive(false, rows.cause && rows.cause.status === 429 ? 'rate limited · cached' : 'API error · cached');
+        renderRows();
+        return;
+      }
       state.rows = rows; state.last = new Date();
       $('listSrc').textContent = SRC_LABEL[tab] + (tab === 'search' ? ' · “' + state.searchQ + '”' : '');
       $('upd').textContent = 'Updated ' + timeStr(state.last) + (tab === 'search' ? '' : ' · auto-refresh 60s');

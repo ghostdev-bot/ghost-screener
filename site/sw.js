@@ -1,5 +1,5 @@
 /* Ghost Screener service worker: caches the app shell only. API data is never cached. */
-var VERSION = 'gs-shell-v6-fb';
+var VERSION = 'gs-shell-v7-fresh';
 var SHELL = [
   '/', '/index.html', '/css/style.css', '/js/app.js', '/manifest.webmanifest',
   '/assets/mark.svg', '/assets/avatar.jpg', '/assets/og.png',
@@ -27,6 +27,14 @@ self.addEventListener('fetch', function (e) {
       var copy = res.clone(); caches.open(VERSION).then(function (c) { c.put('/index.html', copy); });
       return res;
     }).catch(function () { return caches.match('/index.html'); }));
+    return;
+  }
+  // Box-built fallback snapshot: network-first, cached copy only when offline.
+  if (url.pathname.indexOf('/data/') === 0) {
+    e.respondWith(fetch(req, { cache: 'no-store' }).then(function (res) {
+      if (res.ok) { var copy = res.clone(); caches.open(VERSION).then(function (c) { c.put(url.pathname, copy); }); }
+      return res;
+    }).catch(function () { return caches.match(url.pathname); }));
     return;
   }
   // Static shell files: serve from cache fast, refresh in the background.

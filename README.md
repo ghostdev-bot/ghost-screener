@@ -6,6 +6,7 @@ A lightweight, independent screener for trending Solana memecoins with live publ
 
 - Pure static site: `site/index.html`, `site/css/style.css`, `site/js/app.js`. No build step, no keys, no wallet connection, no payments.
 - Data: the public GeckoTerminal and DexScreener APIs, read from the browser.
+- Fallback: if the live trending call fails or is rate limited (one retry first), the table shows the last good copy from this browser, or else `site/data/trending.json`, a snapshot rebuilt by `scripts/refresh.sh`. It is clearly labelled as cached.
 - Routes: `#/` screener, `#/token/<mint>` token detail, `#/featured` for the Get Featured section.
 - Installable PWA (`manifest.webmanifest`, `sw.js`).
 
